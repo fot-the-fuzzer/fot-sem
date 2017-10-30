@@ -1,0 +1,63 @@
+group 'sg.ntu.sec'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'antlr'
+
+sourceCompatibility = 1.8
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-no-listener", "-visitor", "-long-messages", "-lib", "src/main/antlr"]
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:4.7"
+    compile group: 'info.picocli', name: 'picocli', version: '2.0.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+// lint
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
+    }
+}
+
+apply plugin: 'nebula.lint'
+
+// assemble
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.3"
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'tool.Main'
+        )
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
