@@ -1,9 +1,11 @@
 package tool;
 
+import common.Mutation;
+import picocli.CommandLine;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import java.io.File;
 
+@CommandLine.Command(showDefaultValues = true)
 public class CLIOptions {
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message and exit")
     private boolean helpRequested = false;
@@ -15,6 +17,9 @@ public class CLIOptions {
     private boolean versionHelp = false;
 
     @Option(names = {"-o", "--out"}, paramLabel = "FILE", description = "output file")
-    public File outFile;
+    public String outFile;
+
+    @Option(names = {"-m", "--mutation"}, description = "mutation that will be applied")
+    public Mutation mutation = Mutation.RAND;
 
 }

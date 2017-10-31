@@ -100,8 +100,8 @@ public class ECMAScriptParserErrorTest {
         final String rule = "sourceElement";
 
         this.test(new String[]{
-                        "var sum = add(1,2,3 \n",
-                        "function add(a,b,c) return a+b+c }"
+                        "var sum = insert(1,2,3 \n",
+                        "function insert(a,b,c) return a+b+c }"
                 },
                 rule
         );
