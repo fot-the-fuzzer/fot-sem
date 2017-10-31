@@ -47,17 +47,26 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.3"
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
     }
 }
 
-jar {
-    manifest {
-        attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'tool.Main'
-        )
-    }
-}
-
+apply plugin: 'application'
 apply plugin: "com.github.johnrengelman.shadow"
+
+//jar {
+//    manifest {
+//        attributes(
+//                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+//                'Main-Class': 'tool.Main'
+//        )
+//    }
+//}
+
+mainClassName = "tool.Main"
+
+shadowJar {
+    baseName = 'fot-sem'
+    classifier = ''
+    version = ''
+}

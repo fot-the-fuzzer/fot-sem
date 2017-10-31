@@ -17,6 +17,7 @@ public class SemMutate {
     private File file;
     private ParserWrapper wrapper;
     private Mutator mutator;
+    @SuppressWarnings("FieldCanBeLocal")
     private NodeKeeper keeper;
 
     private static Map<String, ParserWrapper> wrappers = new HashMap<>();
@@ -32,6 +33,7 @@ public class SemMutate {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static CharStream getStreamFromFile(File file) throws IOException {
         FileReader reader = new FileReader(file);
         return CharStreams.fromReader(reader);
