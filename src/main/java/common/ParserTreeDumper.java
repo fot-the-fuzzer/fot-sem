@@ -1,7 +1,5 @@
-package js.parser;
+package common;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
@@ -9,10 +7,7 @@ import java.util.List;
 
 public final class ParserTreeDumper {
 
-    public static String toStringASCII(CharStream input) {
-        ECMAScriptParser parser = new ParserWrapper(input).getParser();
-        ParseTree tree = parser.program();
-
+    public static String toStringASCII(ParseTree tree) {
         StringBuilder builder = new StringBuilder();
 
         walk(tree, builder);

@@ -1,11 +1,11 @@
-package js.parser;
+package common;
 
 import org.antlr.v4.runtime.misc.Interval;
 
-public class JSNode {
+public class MutNode {
     private Interval interval;
 
-    public JSNode(Interval interval, String text) {
+    public MutNode(Interval interval, String text) {
         this.interval = interval;
         this.text = text;
     }
@@ -22,7 +22,7 @@ public class JSNode {
 
     @Override
     public String toString() {
-        return "JSNode{" +
+        return "MutNode{" +
                 "interval=" + interval +
                 ", text='" + text + '\'' +
                 '}';

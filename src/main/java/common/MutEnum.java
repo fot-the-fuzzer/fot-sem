@@ -1,5 +1,5 @@
 package common;
 
-public enum Mutation {
+public enum MutEnum {
     INS, DEL, REP, RAND
 }

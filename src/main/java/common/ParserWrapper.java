@@ -1,0 +1,17 @@
+package common;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.TokenStreamRewriter;
+
+public interface ParserWrapper {
+
+    ParserRuleContext getContext();
+
+    TokenStreamRewriter getRewriter();
+
+    void init(CharStream charStream);
+
+    NodeKeeper collect(ParserRuleContext context);
+
+}

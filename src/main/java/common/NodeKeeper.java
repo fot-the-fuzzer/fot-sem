@@ -1,4 +1,4 @@
-package js.parser;
+package common;
 
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -10,10 +10,14 @@ public class NodeKeeper {
         this.fragments = new ArrayList<>();
     }
 
+    /**
+     * this API may be changed
+     * @param map
+     */
     public NodeKeeper(Map<Interval, String> map) {
         this.fragments = new ArrayList<>();
         for(Map.Entry<Interval, String> entry: map.entrySet()) {
-            JSNode node = new JSNode(entry.getKey(), entry.getValue());
+            MutNode node = new MutNode(entry.getKey(), entry.getValue());
             this.fragments.add(node);
         }
     }
@@ -22,9 +26,9 @@ public class NodeKeeper {
         return this.fragments.size();
     }
 
-    private List<JSNode> fragments;
+    private List<MutNode> fragments;
 
-    public JSNode get(int index) {
+    public MutNode get(int index) {
         return this.fragments.get(index);
     }
 
@@ -32,7 +36,7 @@ public class NodeKeeper {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("fragments (size=").append(fragments.size()).append(")\n");
-        for (JSNode entry : fragments) {
+        for (MutNode entry : fragments) {
             sb.append(entry).append("\n");
         }
         return sb.toString();
