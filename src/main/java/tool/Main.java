@@ -1,21 +1,15 @@
 package tool;
 
 import common.*;
-import js.parser.*;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
 import picocli.CommandLine;
-import xml.parser.XMLWrapper;
+import common.SemMutate;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
 
     private static void mutate(File inFile, MutEnum mutEnum, PrintStream outStream) {
+        String name = inFile.getAbsolutePath();
         SemMutate semMutate = new SemMutate(inFile);
         String mutatedText = semMutate.mutate(mutEnum);
         outStream.println(mutatedText);

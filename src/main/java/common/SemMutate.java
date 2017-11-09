@@ -9,12 +9,31 @@ import xml.parser.XMLWrapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SemMutate {
 
-    private File file;
+    public static String run(String buf, String ext) {
+        List<MutEnum> muts = new ArrayList<>();
+        muts.add(MutEnum.INS);
+        muts.add(MutEnum.DEL);
+        muts.add(MutEnum.REP);
+        CharStream stream = getStreamFromStr(buf);
+        String out = null;
+        for (MutEnum mut : muts) {
+            SemMutate semMutate = new SemMutate(buf, ext);
+            out = semMutate.mutate(mut);
+        }
+        return out;
+    }
+
+    private String label;
+    private String content;
     private ParserWrapper wrapper;
     private Mutator mutator;
     @SuppressWarnings("FieldCanBeLocal")
@@ -43,8 +62,34 @@ public class SemMutate {
         return getStreamFromFile(new File(fileName));
     }
 
+    public static String readFileToString(File inFile) {
+        Path path = inFile.toPath();
+        String content = null;
+        try {
+            byte[] bytes = Files.readAllBytes(path);
+            content = new String(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return content;
+    }
+
+    public static CharStream getStreamFromStr(String buf) {
+        return CharStreams.fromString(buf);
+    }
+
+    public SemMutate(String buf, String ext) {
+        this.label = "[buf]";
+        this.content = buf;
+        this.mutator = new Mutator();
+        this.wrapper = wrappers.get(ext);
+        // leave keeper null
+    }
+
     public SemMutate(File file) {
-        this.file = file;
+        this.label = file.getAbsolutePath();
+        this.content = readFileToString(file);
         String fileName = file.getName();
         int idx = fileName.lastIndexOf('.');
         if (idx > 0) {
@@ -58,24 +103,12 @@ public class SemMutate {
         // leave keeper null
     }
 
-    public SemMutate(File file, ParserWrapper wrapper) {
-        this.file = file;
-        this.wrapper = wrapper;
-        this.mutator = new Mutator();
-        // leave keeper null
-    }
-
     public String mutate(MutEnum mutEnum) {
         CharStream stream = null;
-        try {
-            stream = getStreamFromFile(this.file);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
+        stream = getStreamFromStr(this.content);
         this.wrapper.init(stream);
-        this.keeper = wrapper.collect(wrapper.getContext());
-        TokenStreamRewriter rewriter = wrapper.getRewriter();
+        this.keeper = this.wrapper.collect(this.wrapper.getContext());
+        TokenStreamRewriter rewriter = this.wrapper.getRewriter();
         switch (mutEnum) {
             case INS:
                 return this.mutator.insert(rewriter, this.keeper);
