@@ -54,14 +54,14 @@ buildscript {
 apply plugin: 'application'
 apply plugin: "com.github.johnrengelman.shadow"
 
-//jar {
-//    manifest {
-//        attributes(
-//                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-//                'Main-Class': 'tool.Main'
-//        )
-//    }
-//}
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'tool.Main'
+        )
+    }
+}
 
 mainClassName = "tool.Main"
 

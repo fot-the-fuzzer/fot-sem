@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ "$#" -lt 1 ]; then
+    echo "usage $0 ./xxx.g4"
+    exit 1
+fi
+
+echo "generate java files from g4 ..."
+java -cp "antlr4.jar:$CLASSPATH" org.antlr.v4.Tool -visitor -listener $*
+
+echo "compile java files ..."
+target_dir="classes"
+if ! [ -d "${target_dir}" ]; then
+    mkdir -p "${target_dir}"
+fi
+javac -cp "antlr4.jar:$CLASSPATH" *.java
+mv *.java *.class *.tokens "${target_dir}"

@@ -23,8 +23,8 @@ public final class JSWrapper implements ParserWrapper {
     }
 
     @Override
-    public void init(CharStream input) {
-        Lexer lexer = new ECMAScriptLexer(input);
+    public void init(CharStream charStream) {
+        Lexer lexer = new ECMAScriptLexer(charStream);
         ListenerUtils.withDefaultListener(lexer);
 
         this.tokenStream = new CommonTokenStream(lexer);
@@ -42,8 +42,8 @@ public final class JSWrapper implements ParserWrapper {
     public JSWrapper() {
     }
 
-    public JSWrapper(CharStream input) {
-        init(input);
+    public JSWrapper(CharStream charStream) {
+        init(charStream);
     }
 
     JSWrapper(ECMAScriptLexer lexer) {

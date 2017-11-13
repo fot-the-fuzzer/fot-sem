@@ -1,5 +1,6 @@
 package common;
 
+import css.parser.CSSWrapper;
 import js.parser.JSWrapper;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -44,6 +45,7 @@ public class SemMutate {
     static {
         wrappers.put("js", new JSWrapper());
         wrappers.put("xml", new XMLWrapper());
+        wrappers.put("css", new CSSWrapper());
     }
 
     public static void populateWrappers(Map<String, ParserWrapper> map) {
