@@ -11,6 +11,11 @@ public class XMLWrapper implements ParserWrapper {
     private XMLParser parser;
 
     @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
     public ParserRuleContext getContext() {
         return this.parser.document();
     }

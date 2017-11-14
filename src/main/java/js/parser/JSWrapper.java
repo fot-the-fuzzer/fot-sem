@@ -10,6 +10,11 @@ public final class JSWrapper implements ParserWrapper {
     private CommonTokenStream tokenStream;
     private ECMAScriptParser parser;
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
     public ECMAScriptParser getParser() {
         return this.parser;
     }

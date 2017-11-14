@@ -40,4 +40,9 @@ public class CSSWrapper implements ParserWrapper {
         collector.visit(context);
         return new NodeKeeper(collector.getMap());
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

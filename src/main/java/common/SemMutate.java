@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class SemMutate {
 
-    public static String run(String buf, String ext) {
+    public static String run(String buf, String ext) throws ParserNotFoundException {
         List<MutEnum> muts = new ArrayList<>();
         muts.add(MutEnum.INS);
         muts.add(MutEnum.DEL);
@@ -77,50 +78,61 @@ public class SemMutate {
         return content;
     }
 
+    private ParserWrapper initWrapper(String ext) throws ParserNotFoundException {
+        ParserWrapper wrapper = null;
+        if (ext == null) {
+            throw new ParserNotFoundException("NULL");
+        } else {
+            wrapper = wrappers.get(ext);
+            if (wrapper == null) {
+                throw new ParserNotFoundException(ext);
+            }
+        }
+        return wrapper;
+    }
+
     public static CharStream getStreamFromStr(String buf) {
         return CharStreams.fromString(buf);
     }
 
-    public SemMutate(String buf, String ext) {
+    public SemMutate(String buf, String ext) throws ParserNotFoundException {
+        this.wrapper = initWrapper(ext);
+        this.mutator = new Mutator();
         this.label = "[buf]";
         this.content = buf;
-        this.mutator = new Mutator();
-        this.wrapper = wrappers.get(ext);
         // leave keeper null
     }
 
-    public SemMutate(File file) {
+    public SemMutate(File file, String ext) throws ParserNotFoundException {
+        this.wrapper = initWrapper(ext);
+        this.mutator = new Mutator();
         this.label = file.getAbsolutePath();
         this.content = readFileToString(file);
-        String fileName = file.getName();
-        int idx = fileName.lastIndexOf('.');
-        if (idx > 0) {
-            String ext = fileName.substring(idx + 1).toLowerCase();
-            this.wrapper = wrappers.get(ext);
-        } else {
-            System.err.printf("unknown file extension: %s\n", fileName);
-            System.exit(1);
-        }
-        this.mutator = new Mutator();
         // leave keeper null
     }
 
     public String mutate(MutEnum mutEnum) {
         CharStream stream = null;
         stream = getStreamFromStr(this.content);
-        this.wrapper.init(stream);
-        this.keeper = this.wrapper.collect(this.wrapper.getContext());
-        TokenStreamRewriter rewriter = this.wrapper.getRewriter();
-        switch (mutEnum) {
-            case INS:
-                return this.mutator.insert(rewriter, this.keeper);
-            case DEL:
-                return this.mutator.delete(rewriter, this.keeper);
-            case REP:
-                return this.mutator.replace(rewriter, this.keeper);
-            case RAND:
-            default:
-                return this.mutator.random(rewriter, this.keeper);
+        try {
+            this.wrapper.init(stream);
+            this.keeper = this.wrapper.collect(this.wrapper.getContext());
+            TokenStreamRewriter rewriter = this.wrapper.getRewriter();
+            switch (mutEnum) {
+                case INS:
+                    return this.mutator.insert(rewriter, this.keeper);
+                case DEL:
+                    return this.mutator.delete(rewriter, this.keeper);
+                case REP:
+                    return this.mutator.replace(rewriter, this.keeper);
+                case RAND:
+                default:
+                    return this.mutator.random(rewriter, this.keeper);
+            }
+        } catch (ParseErrorException e) {
+            System.err.printf("Error when parsing %s with %s\ncause: %s\n", this.label, this.wrapper, e.getMessage());
+            System.exit(1);
+            return "";
         }
     }
 

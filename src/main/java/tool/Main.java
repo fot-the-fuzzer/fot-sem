@@ -8,9 +8,19 @@ import java.io.*;
 
 public class Main {
 
-    private static void mutate(File inFile, MutEnum mutEnum, PrintStream outStream) {
+    private static String inferExt(File file) {
+        String fileName = file.getName();
+        int idx = fileName.lastIndexOf('.');
+        if (idx > 0 ) {
+            return fileName.substring(idx + 1).toLowerCase();
+        } else {
+            return null;
+        }
+    }
+
+    private static void mutate(File inFile, String ext, MutEnum mutEnum, PrintStream outStream) throws ParserNotFoundException {
         String name = inFile.getAbsolutePath();
-        SemMutate semMutate = new SemMutate(inFile);
+        SemMutate semMutate = new SemMutate(inFile, ext);
         String mutatedText = semMutate.mutate(mutEnum);
         outStream.println(mutatedText);
     }
@@ -43,7 +53,13 @@ public class Main {
                 printStream = new PrintStream(fos);
             }
             if (options.inputFile != null) {
-                mutate(options.inputFile, options.mutEnum, printStream);
+                String ext = null;
+                if (options.ext!=null) {
+                    ext = options.ext;
+                } else {
+                    ext = inferExt(options.inputFile);
+                }
+                mutate(options.inputFile, ext, options.mutEnum, printStream);
             } else {
                 System.err.println("input file not specified");
                 cli.usage(System.err);

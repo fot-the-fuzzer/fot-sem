@@ -13,6 +13,9 @@ public class CLIOptions {
     @Option(names = {"-i", "--in"}, paramLabel = "FILE", description = "input file")
     public File inputFile;
 
+    @Option(names = {"-p", "--parser"}, paramLabel = "EXT", description = "file extension (corresponding to parser)")
+    public String ext;
+
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "Display version info and exit")
     private boolean versionHelp = false;
 

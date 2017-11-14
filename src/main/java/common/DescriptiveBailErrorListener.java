@@ -17,7 +17,6 @@ public class DescriptiveBailErrorListener extends BaseErrorListener {
 
         String entireMessage = String.format("source: %s, line: %s, index: %s, error message: %s",
                 recognizer.getInputStream().getSourceName(), line, charPositionInLine, msg);
-
-        throw new RuntimeException(entireMessage);
+        throw new ParseErrorException(entireMessage);
     }
 }
