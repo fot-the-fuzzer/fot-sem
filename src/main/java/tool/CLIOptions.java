@@ -1,28 +1,52 @@
 package tool;
 
 import common.MutEnum;
-import picocli.CommandLine;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Command;
+
 import java.io.File;
 
-@CommandLine.Command(showDefaultValues = true)
+@Command(showDefaultValues = true)
 public class CLIOptions {
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message and exit")
     private boolean helpRequested = false;
 
-    @Option(names = {"-i", "--in"}, paramLabel = "FILE", description = "input file")
-    public File inputFile;
-
-    @Option(names = {"-p", "--parser"}, paramLabel = "EXT", description = "file extension (corresponding to parser)")
-    public String ext;
-
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "Display version info and exit")
     private boolean versionHelp = false;
 
-    @Option(names = {"-o", "--out"}, paramLabel = "FILE", description = "output file")
-    public String outFile;
+    @Option(names = {"-i", "--in"}, paramLabel = "FILE", description = "input file/directory")
+    public File inputFile;
 
+    @Option(names = {"-o", "--out"}, paramLabel = "FILE", description = "output file/directory, default to stdout")
+    public String out;
+
+    @Option(names = {"-e", "--ext"}, paramLabel = "EXT", description = "file extension of the input files (when not specified, will infer from file name)")
+    public String ext;
+
+    @Option(names = {"-p", "--prefix"}, description = "out files' name prefix (when output is a directory, used to avoid name clashes)")
+    public String prefix = "";
+
+    /**
+     * for dumper
+     */
     @Option(names = {"-m", "--mutEnum"}, description = "mutEnum that will be applied")
     public MutEnum mutEnum = MutEnum.RAND;
 
+    /**
+     * for generator
+     */
+    @Option(names = {"-n", "--num"}, description = "numbers of iterations to be generated, infinite when value <0")
+    public long iterations = -1;
+
+    @Override
+    public String toString() {
+        return "CLIOptions{" +
+                "inputFile=" + inputFile +
+                ", out='" + out + '\'' +
+                ", ext='" + ext + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", mutEnum=" + mutEnum +
+                ", iterations=" + iterations +
+                '}';
+    }
 }
