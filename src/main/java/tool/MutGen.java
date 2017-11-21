@@ -1,7 +1,6 @@
 package tool;
 
-import common.FileDelVisitor;
-import common.Utils;
+import common.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +9,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class MutGen {
 
-    public static Logger logger = LoggerFactory.getLogger(MutGen.class);
+    private static Logger logger = LoggerFactory.getLogger(MutGen.class);
 
     private String prefix;
     private String ext;
@@ -22,7 +23,8 @@ public class MutGen {
     private File inputFile;
     private File outputFile;
     private long iterations;
-    private HashSet<String> generated;
+    private HashSet<String> generatedMd5;
+    private List<SemMutate> semMutates;
     private long counter;
 
     private static String inferExt(File file) {
@@ -64,7 +66,7 @@ public class MutGen {
                     Files.delete(path);
                 }
             } catch (IOException e) {
-                e.printStackTrace(System.err);
+                logger.error(e.getMessage());
                 System.exit(1);
             }
         }
@@ -78,26 +80,100 @@ public class MutGen {
         } else {
             this.prefix = opt.prefix;
         }
-        this.generated = new HashSet<>();
+        this.generatedMd5 = new HashSet<>();
         this.counter = 0;
+        this.semMutates = new ArrayList<>();
     }
 
-    private void collectNew() {
-
+    private void initSeeds() {
+        if (this.fromDir) {
+            File backupDir = new File(this.inputFile, "backup");
+            if (!backupDir.exists()) {
+                boolean success = backupDir.mkdirs();
+                if (!success) {
+                    logger.error("cannot create directory: {}", backupDir);
+                    System.exit(1);
+                }
+            }
+            // rename files
+            File[] inputFiles = this.inputFile.listFiles();
+            if (inputFiles != null) {
+                for (File srcFile : inputFiles) {
+                    if (srcFile.isFile()) {
+                        File dstFile = new File(backupDir, srcFile.getName());
+                        boolean success = srcFile.renameTo(dstFile);
+                        if (!success) {
+                            logger.error("cannot rename {} to {}", srcFile, dstFile);
+                            System.exit(1);
+                        }
+                        try {
+                            logger.info("new seed: {}", dstFile);
+                            SemMutate semMutate = new SemMutate(dstFile, this.ext);
+                            this.semMutates.add(semMutate);
+                        } catch (ParserNotFoundException e) {
+                            logger.error(e.getMessage());
+                            System.exit(1);
+                        }
+                    }
+                }
+            }
+            // backup files into sem
+            File[] bakFiles = backupDir.listFiles();
+            if (bakFiles != null) {
+                for (File bakFile : bakFiles) {
+                    if (bakFile.isFile()) {
+                        addToSem(bakFile);
+                    }
+                }
+            }
+        } else {
+            addToSem(this.inputFile);
+        }
     }
 
-    // TODO
+    private void addToSem(File file) {
+        logger.info("new seed: {}", file);
+        try {
+            SemMutate semMutate = new SemMutate(file, this.ext);
+            this.semMutates.add(semMutate);
+        } catch (ParserNotFoundException e) {
+            logger.error(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private void collectNewSeeds() {
+        assert this.inputFile.isDirectory();
+        File[] inFiles = this.inputFile.listFiles();
+        File backupDir = new File(this.inputFile, "backup");
+        if (inFiles != null) {
+            for (File srcFile : inFiles) {
+                if (srcFile.isFile()) {
+                    File dstFile = new File(backupDir, srcFile.getName());
+                    boolean success = srcFile.renameTo(dstFile);
+                    if (!success) {
+                        logger.error("failed to rename {} to {}", srcFile, dstFile);
+                        System.exit(1);
+                    }
+                    addToSem(dstFile);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @NotNull
-    private String mutateImpl() {
-        return null;
+    private String mutateImpl(SemMutate semMutate) {
+        String mutated = semMutate.mutate(MutEnum.RAND);
+        return mutated;
     }
 
-    private void dumpToFile(String content) {
+    private void dumpToFile(String content, String label) {
         String fileName;
         if (this.prefix.equals("")) {
-            fileName = String.format("%s.%s", this.counter, this.ext);
+            fileName = String.format("%s-%08d.%s", label, this.counter, this.ext);
         } else {
-            fileName = String.format("%s-%s.%s", this.prefix, this.counter, this.ext);
+            fileName = String.format("%s-%s-%08d.%s", this.prefix, label, this.counter, this.ext);
         }
         Path outPath = Paths.get(this.outputFile.getPath(), fileName);
         OutputStream os = null;
@@ -106,24 +182,29 @@ public class MutGen {
             PrintStream out = new PrintStream(os);
             out.println(content);
         } catch (FileNotFoundException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
             System.exit(1);
         }
     }
 
     private void mutate() {
-        String mutatedText = mutateImpl();
-        String md5 = Utils.getMD5(mutatedText);
-        if (!this.generated.contains(md5)) {
-            dumpToFile(mutatedText);
+        for (SemMutate semMutate : this.semMutates) {
+            String label = semMutate.getLabel();
+            logger.info("round {} on {}", this.counter, label);
+            String mutatedText = mutateImpl(semMutate);
+            String md5 = Utils.getMD5(mutatedText);
+            if (!this.generatedMd5.contains(md5)) {
+                dumpToFile(mutatedText, label);
+            }
         }
     }
 
     public void run() {
+        initSeeds();
         while (this.counter != this.iterations) {
             this.counter += 1;
             if (this.fromDir) {
-                collectNew();
+                collectNewSeeds();
             }
             mutate();
         }

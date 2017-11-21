@@ -5,6 +5,8 @@ import js.parser.JSWrapper;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xml.parser.XMLWrapper;
 
 import java.io.File;
@@ -12,27 +14,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Wrapper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SemMutate {
 
-    public static String run(String buf, String ext) throws ParserNotFoundException {
-        List<MutEnum> muts = new ArrayList<>();
-        muts.add(MutEnum.INS);
-        muts.add(MutEnum.DEL);
-        muts.add(MutEnum.REP);
-        CharStream stream = getStreamFromStr(buf);
-        String out = null;
-        for (MutEnum mut : muts) {
-            SemMutate semMutate = new SemMutate(buf, ext);
-            out = semMutate.mutate(mut);
-        }
-        return out;
-    }
+    private static Logger logger = LoggerFactory.getLogger(SemMutate.class);
 
     private String label;
     private String content;
@@ -42,6 +28,10 @@ public class SemMutate {
     private NodeKeeper keeper;
 
     private static Map<String, ParserWrapper> wrappers = new HashMap<>();
+
+    public String getLabel() {
+        return label;
+    }
 
     static {
         wrappers.put("js", new JSWrapper());
@@ -72,7 +62,7 @@ public class SemMutate {
             byte[] bytes = Files.readAllBytes(path);
             content = new String(bytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             System.exit(1);
         }
         return content;
@@ -95,10 +85,19 @@ public class SemMutate {
         return CharStreams.fromString(buf);
     }
 
+
     public SemMutate(String buf, String ext) throws ParserNotFoundException {
+        this(buf, ext, null);
+    }
+
+    public SemMutate(String buf, String ext, String label) throws ParserNotFoundException {
         this.wrapper = initWrapper(ext);
         this.mutator = new Mutator();
-        this.label = "[buf]";
+        if (label != null) {
+            this.label = label;
+        } else {
+            this.label = "buf";
+        }
         this.content = buf;
         // leave keeper null
     }
@@ -106,7 +105,7 @@ public class SemMutate {
     public SemMutate(File file, String ext) throws ParserNotFoundException {
         this.wrapper = initWrapper(ext);
         this.mutator = new Mutator();
-        this.label = file.getAbsolutePath();
+        this.label = Utils.getBaseName(file);
         this.content = readFileToString(file);
         // leave keeper null
     }

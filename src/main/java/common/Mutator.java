@@ -2,11 +2,15 @@ package common;
 
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Mutator {
+
+    private Logger logger = LoggerFactory.getLogger(Mutator.class);
 
     private Random rnd = ThreadLocalRandom.current();
 
@@ -46,7 +50,7 @@ public class Mutator {
     }
 
     public String insert(TokenStreamRewriter rewriter, NodeKeeper keeper) {
-        System.out.println("insert...");
+        logger.debug("insert...");
         int size = keeper.size();
         int i1 = rnd.nextInt(size);
         MutNode n1 = keeper.get(i1);
@@ -61,7 +65,7 @@ public class Mutator {
     }
 
     public String delete(TokenStreamRewriter rewriter, NodeKeeper keeper) {
-        System.out.println("delete...");
+        logger.debug("delete...");
         int idx = rnd.nextInt(keeper.size());
         MutNode node = keeper.get(idx);
         this.delete(rewriter, node.getInterval());
@@ -69,7 +73,7 @@ public class Mutator {
     }
 
     public String replace(TokenStreamRewriter rewriter, NodeKeeper keeper) {
-        System.out.println("replace...");
+        logger.debug("replace...");
         int size = keeper.size();
         int i1 = rnd.nextInt(size);
         int i2 = rnd.nextInt(size);
