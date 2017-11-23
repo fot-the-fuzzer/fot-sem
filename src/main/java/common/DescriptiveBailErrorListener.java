@@ -14,9 +14,6 @@ public class DescriptiveBailErrorListener extends BaseErrorListener {
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                             int line, int charPositionInLine,
                             String msg, RecognitionException e) {
-
-        String entireMessage = String.format("source: %s, line: %s, index: %s, error message: %s",
-                recognizer.getInputStream().getSourceName(), line, charPositionInLine, msg);
-        throw new ParseErrorException(entireMessage);
+        throw new ParseErrorException(recognizer.getInputStream().getSourceName(), line, charPositionInLine, msg);
     }
 }

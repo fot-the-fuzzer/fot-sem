@@ -8,7 +8,7 @@
     </appender>
 
     <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>sem_mutate.log</file>
+        <file>/tmp/sem_mutate.log</file>
         <encoder>
             <pattern>[%date{dd MMM yyyy;HH:mm:ss.SSS,UTC}] - [%3thread] %level [%logger{0}:%line] - %msg%n%ex{1}
             </pattern>

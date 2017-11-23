@@ -129,9 +129,8 @@ public class SemMutate {
                     return this.mutator.random(rewriter, this.keeper);
             }
         } catch (ParseErrorException e) {
-            System.err.printf("Error when parsing %s with %s\ncause: %s\n", this.label, this.wrapper, e.getMessage());
-            System.exit(1);
-            return "";
+            e.setSource(this.label);
+            throw e;
         }
     }
 

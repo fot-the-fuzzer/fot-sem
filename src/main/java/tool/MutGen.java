@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 public class MutGen {
@@ -56,23 +57,11 @@ public class MutGen {
             }
         }
         File outFile = new File(opt.out);
-        if (outFile.exists()) {
-            logger.warn("removing existing out file: {}", outFile);
-            Path path = outFile.toPath();
-            try {
-                if (outFile.isDirectory()) {
-                    Files.walkFileTree(path, new FileDelVisitor());
-                } else {
-                    Files.delete(path);
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage());
-                System.exit(1);
+        if (!outFile.exists()) {
+            boolean succeed = outFile.mkdirs();
+            if (!succeed) {
+                throw new MutParseException("failed to create output directory", opt);
             }
-        }
-        boolean succeed = outFile.mkdirs();
-        if (!succeed) {
-            throw new MutParseException("failed to create output directory", opt);
         }
         this.outputFile = outFile;
         if (opt.prefix == null) {
@@ -188,13 +177,20 @@ public class MutGen {
     }
 
     private void mutate() {
-        for (SemMutate semMutate : this.semMutates) {
+        Iterator<SemMutate> iterator = this.semMutates.iterator();
+        while (iterator.hasNext()) {
+            SemMutate semMutate = iterator.next();
             String label = semMutate.getLabel();
             logger.info("round {} on {}", this.counter, label);
-            String mutatedText = mutateImpl(semMutate);
-            String md5 = Utils.getMD5(mutatedText);
-            if (!this.generatedMd5.contains(md5)) {
-                dumpToFile(mutatedText, label);
+            try {
+                String mutatedText = mutateImpl(semMutate);
+                String md5 = Utils.getMD5(mutatedText);
+                if (!this.generatedMd5.contains(md5)) {
+                    dumpToFile(mutatedText, label);
+                }
+            } catch (ParseErrorException e) {
+                logger.warn("parsing error, source: {}, line: {}, column: {}, removing...\nmessage: {}\n", e.getSource(), e.getRow(), e.getColumn(), e.getMessage());
+                iterator.remove();
             }
         }
     }
