@@ -36,11 +36,11 @@ public class ECMAScriptParserErrorTest {
         try {
             // Create the lexer and parser.
             CharStream stream= CharStreams.fromString(source);
-            ECMAScriptLexer lexer = new JSLexerWrapper(stream)
+            ECMAScriptLexer lexer = new JSFotLexer(stream)
                     .withStrictMode(strictMode)
                     .build();
 
-            ECMAScriptParser parser = new JSWrapper(lexer).getParser();
+            ECMAScriptParser parser = new JSFotParser(lexer).getParser();
 
             // Invoke the parser's rule.
             Method method = ECMAScriptParser.class.getDeclaredMethod(rule);

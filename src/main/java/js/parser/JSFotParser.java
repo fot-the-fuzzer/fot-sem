@@ -2,10 +2,10 @@ package js.parser;
 
 import common.ListenerUtils;
 import common.NodeKeeper;
-import common.ParserWrapper;
+import common.FotParser;
 import org.antlr.v4.runtime.*;
 
-public final class JSWrapper implements ParserWrapper {
+public final class JSFotParser implements FotParser {
 
     private CommonTokenStream tokenStream;
     private ECMAScriptParser parser;
@@ -44,20 +44,20 @@ public final class JSWrapper implements ParserWrapper {
         return new NodeKeeper(collector.getMap());
     }
 
-    public JSWrapper() {
+    public JSFotParser() {
     }
 
-    public JSWrapper(CharStream charStream) {
+    public JSFotParser(CharStream charStream) {
         init(charStream);
     }
 
-    JSWrapper(ECMAScriptLexer lexer) {
+    JSFotParser(ECMAScriptLexer lexer) {
         this.tokenStream = new CommonTokenStream(lexer);
         this.parser = new ECMAScriptParser(this.tokenStream);
         ListenerUtils.withDefaultListener(this.parser);
     }
 
-    public JSWrapper withErrorListener(ANTLRErrorListener listener) {
+    public JSFotParser withErrorListener(ANTLRErrorListener listener) {
         ListenerUtils.withListener(this.parser, listener);
         return this;
     }

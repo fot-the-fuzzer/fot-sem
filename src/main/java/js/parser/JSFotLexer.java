@@ -4,22 +4,22 @@ import common.ListenerUtils;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.CharStream;
 
-public final class JSLexerWrapper {
+public final class JSFotLexer {
 
     private ECMAScriptLexer lexer;
 
     @SuppressWarnings("WeakerAccess")
-    public JSLexerWrapper(CharStream input) {
+    public JSFotLexer(CharStream input) {
         this.lexer = new ECMAScriptLexer(input);
         ListenerUtils.withDefaultListener(this.lexer);
     }
 
-    public JSLexerWrapper withStrictMode(boolean strictMode) {
+    public JSFotLexer withStrictMode(boolean strictMode) {
         this.lexer.setStrictMode(strictMode);
         return this;
     }
 
-    public JSLexerWrapper withErrorListener(ANTLRErrorListener listener) {
+    public JSFotLexer withErrorListener(ANTLRErrorListener listener) {
         ListenerUtils.withListener(this.lexer, listener);
         return this;
     }

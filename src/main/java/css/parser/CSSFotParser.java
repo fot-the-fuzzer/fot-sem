@@ -1,23 +1,18 @@
-package xml.parser;
+package css.parser;
 
 import common.ListenerUtils;
 import common.NodeKeeper;
-import common.ParserWrapper;
+import common.FotParser;
 import org.antlr.v4.runtime.*;
 
-public class XMLWrapper implements ParserWrapper {
+public class CSSFotParser implements FotParser {
 
     private CommonTokenStream tokenStream;
-    private XMLParser parser;
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName();
-    }
+    private CSS3Parser parser;
 
     @Override
     public ParserRuleContext getParseRuleContext() {
-        return this.parser.document();
+        return this.parser.stylesheet();
     }
 
     @Override
@@ -25,24 +20,29 @@ public class XMLWrapper implements ParserWrapper {
         return new TokenStreamRewriter(this.tokenStream);
     }
 
-    public XMLWrapper() {
+    public CSSFotParser() {
     }
 
     @Override
     public void init(CharStream charStream) {
-        Lexer lexer = new XMLLexer(charStream);
+        Lexer lexer = new CSS3Lexer(charStream);
         ListenerUtils.withDefaultListener(lexer);
 
         this.tokenStream = new CommonTokenStream(lexer);
 
-        this.parser = new XMLParser(this.tokenStream);
+        this.parser = new CSS3Parser(this.tokenStream);
         ListenerUtils.withDefaultListener(this.parser);
     }
 
+    @Override
     public NodeKeeper collect(ParserRuleContext context) {
-        XMLCollector collector = new XMLCollector();
+        CSSCollector collector = new CSSCollector();
         collector.visit(context);
         return new NodeKeeper(collector.getMap());
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

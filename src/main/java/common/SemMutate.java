@@ -1,13 +1,13 @@
 package common;
 
-import css.parser.CSSWrapper;
-import js.parser.JSWrapper;
+import css.parser.CSSFotParser;
+import js.parser.JSFotParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xml.parser.XMLWrapper;
+import xml.parser.XMLFotParser;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,25 +22,25 @@ public class SemMutate {
 
     private String label;
     private String content;
-    private ParserWrapper wrapper;
+    private FotParser wrapper;
     private Mutator mutator;
     @SuppressWarnings("FieldCanBeLocal")
     private NodeKeeper keeper;
 
-    private static Map<String, ParserWrapper> wrappers = new HashMap<>();
+    private static Map<String, FotParser> wrappers = new HashMap<>();
 
     public String getLabel() {
         return label;
     }
 
     static {
-        wrappers.put("js", new JSWrapper());
-        wrappers.put("xml", new XMLWrapper());
-        wrappers.put("css", new CSSWrapper());
+        wrappers.put("js", new JSFotParser());
+        wrappers.put("xml", new XMLFotParser());
+        wrappers.put("css", new CSSFotParser());
     }
 
-    public static void populateWrappers(Map<String, ParserWrapper> map) {
-        for (Map.Entry<String, ParserWrapper> entry : map.entrySet()) {
+    public static void populateWrappers(Map<String, FotParser> map) {
+        for (Map.Entry<String, FotParser> entry : map.entrySet()) {
             wrappers.put(entry.getKey(), entry.getValue());
         }
     }
@@ -68,8 +68,8 @@ public class SemMutate {
         return content;
     }
 
-    private ParserWrapper initWrapper(String ext) throws ParserNotFoundException {
-        ParserWrapper wrapper = null;
+    private FotParser initWrapper(String ext) throws ParserNotFoundException {
+        FotParser wrapper = null;
         if (ext == null) {
             throw new ParserNotFoundException("NULL");
         } else {
@@ -81,7 +81,7 @@ public class SemMutate {
         return wrapper;
     }
 
-    public static CharStream getStreamFromStr(String buf) {
+    private static CharStream getStreamFromStr(String buf) {
         return CharStreams.fromString(buf);
     }
 

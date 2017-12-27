@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 
-public interface ParserWrapper {
+public interface FotParser {
 
     ParserRuleContext getParseRuleContext();
 

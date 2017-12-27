@@ -4,7 +4,15 @@ version '0.0.1'
 apply plugin: 'java'
 apply plugin: 'antlr'
 
-sourceCompatibility = 1.8
+compileJava {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
+compileTestJava {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
 
 allprojects {
     gradle.projectsEvaluated {
