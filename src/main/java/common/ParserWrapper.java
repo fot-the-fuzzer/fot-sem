@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 
 public interface ParserWrapper {
 
-    ParserRuleContext getContext();
+    ParserRuleContext getParseRuleContext();
 
     TokenStreamRewriter getRewriter();
 

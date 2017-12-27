@@ -19,7 +19,7 @@ public final class JSWrapper implements ParserWrapper {
         return this.parser;
     }
 
-    public ParserRuleContext getContext() {
+    public ParserRuleContext getParseRuleContext() {
         return this.parser.program();
     }
 

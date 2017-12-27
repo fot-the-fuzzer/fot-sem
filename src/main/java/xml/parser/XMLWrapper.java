@@ -16,7 +16,7 @@ public class XMLWrapper implements ParserWrapper {
     }
 
     @Override
-    public ParserRuleContext getContext() {
+    public ParserRuleContext getParseRuleContext() {
         return this.parser.document();
     }
 

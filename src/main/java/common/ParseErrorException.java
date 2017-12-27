@@ -30,7 +30,4 @@ public class ParseErrorException extends RuntimeException {
         this.column = column;
     }
 
-
-
-
 }

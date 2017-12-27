@@ -115,7 +115,7 @@ public class SemMutate {
         stream = getStreamFromStr(this.content);
         try {
             this.wrapper.init(stream);
-            this.keeper = this.wrapper.collect(this.wrapper.getContext());
+            this.keeper = this.wrapper.collect(this.wrapper.getParseRuleContext());
             TokenStreamRewriter rewriter = this.wrapper.getRewriter();
             switch (mutEnum) {
                 case INS:

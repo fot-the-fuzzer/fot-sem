@@ -11,7 +11,7 @@ public class CSSWrapper implements ParserWrapper {
     private CSS3Parser parser;
 
     @Override
-    public ParserRuleContext getContext() {
+    public ParserRuleContext getParseRuleContext() {
         return this.parser.stylesheet();
     }
 
