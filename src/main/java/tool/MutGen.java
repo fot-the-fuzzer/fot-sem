@@ -56,6 +56,13 @@ public class MutGen {
             }
         }
         File outFile = new File(opt.out);
+        if (outFile.isFile()) {
+            logger.info("removing file: {}", outFile.getName());
+            boolean succeed = outFile.delete();
+            if (!succeed) {
+                throw new MutParseException("failed to delete existing file (preparing for mkdir)", opt);
+            }
+        }
         if (!outFile.exists()) {
             boolean succeed = outFile.mkdirs();
             if (!succeed) {
@@ -180,7 +187,7 @@ public class MutGen {
         while (iterator.hasNext()) {
             SemMutate semMutate = iterator.next();
             String label = semMutate.getLabel();
-            logger.info("round {} on {}", this.counter, label);
+            logger.info("Iteration {} on {}", this.counter, label);
             try {
                 String mutatedText = mutateImpl(semMutate);
                 String md5 = Utils.getMD5(mutatedText);

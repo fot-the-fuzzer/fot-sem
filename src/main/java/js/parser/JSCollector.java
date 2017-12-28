@@ -3,6 +3,7 @@ package js.parser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class JSCollector extends ECMAScriptBaseVisitor {
 
     private Map<Interval, String> map;
 
-    public JSCollector() {
+    JSCollector() {
         this.map = new HashMap<>();
     }
 
@@ -25,10 +26,17 @@ public class JSCollector extends ECMAScriptBaseVisitor {
         // for text
         int a = ctx.start.getStartIndex();
         int b = ctx.stop.getStopIndex();
+        if (a >= b) {
+            return;
+        }
         Interval textInterval = new Interval(a, b);
         CharStream input = ctx.start.getInputStream();
-        String text = input.getText(textInterval);
-        this.map.put(interval, text);
+        try {
+            String text = input.getText(textInterval);
+            this.map.put(interval, text);
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.printf("error: %s, (%d, %d)\n", e.getMessage(), a, b);
+        }
     }
 
     private void ignore(ParserRuleContext ctx) {

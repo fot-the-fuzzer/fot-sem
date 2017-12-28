@@ -6,7 +6,11 @@ import picocli.CommandLine.Command;
 
 import java.io.File;
 
-@Command(showDefaultValues = true)
+@Command(name = "fot-sem",
+        showDefaultValues = true,
+        version = "0.0.1",
+        header = "FOT Semantic Fuzzing CLI tool",
+        description = "This is a wrapper for a jar runnable, which can also be used as a library/FFI.\n\n")
 public class CLIOptions {
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message and exit")
     private boolean helpRequested = false;

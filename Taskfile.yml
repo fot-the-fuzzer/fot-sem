@@ -1,0 +1,22 @@
+default:
+  deps: [package]
+
+build:
+  cmds:
+    - ./gradlew build
+
+package:
+  cmds:
+    - ./gradlew installDist
+
+install:
+  deps: [package]
+  cmds:
+    - sudo mkdir -p {{.INSTALL_DIR}}/bin && sudo install -D ./build/install/fot-sem/bin/* {{.INSTALL_DIR}}/bin
+    - sudo mkdir -p {{.INSTALL_DIR}}/lib && sudo install -D ./build/install/fot-sem/lib/* {{.INSTALL_DIR}}/lib
+
+uninstall:
+  cmds:
+    - sudo rm -f {{.INSTALL_DIR}}/bin/fot-sem*
+    - sudo rm -f {{.INSTALL_DIR}}/lib/*.jar
+
