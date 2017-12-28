@@ -69,7 +69,7 @@ public class MutGen {
             this.prefix = opt.prefix;
         }
         this.generatedMd5 = new HashSet<>();
-        this.counter = 0;
+        this.counter = opt.start;
         this.semMutates = new ArrayList<>();
     }
 
@@ -196,7 +196,8 @@ public class MutGen {
 
     public void run() {
         initSeeds();
-        while (this.counter != this.iterations) {
+        long last = this.counter + this.iterations;
+        while (this.counter != last) {
             this.counter += 1;
             if (this.fromDir) {
                 collectNewSeeds();

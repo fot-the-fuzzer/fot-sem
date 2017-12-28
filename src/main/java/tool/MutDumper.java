@@ -7,6 +7,9 @@ import common.Utils;
 
 import java.io.File;
 
+/**
+ * dump to stdout
+ */
 public class MutDumper {
     private File inFile;
     private String ext;

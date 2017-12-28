@@ -26,6 +26,9 @@ public class CLIOptions {
     @Option(names = {"-p", "--prefix"}, description = "out files' name prefix (when output is a directory, used to avoid name clashes)")
     public String prefix = "";
 
+    @Option(names = {"-s", "--start"}, description = "starting index")
+    public long start = 0;
+
     /**
      * for dumper
      */
@@ -37,6 +40,21 @@ public class CLIOptions {
      */
     @Option(names = {"-n", "--num"}, description = "numbers of iterations to be generated, infinite when value <0")
     public long iterations = -1;
+
+    public CLIOptions() {
+    }
+
+    public CLIOptions(String inFile, String outDir, String ext, long iterations, long start) {
+        this.start = start;
+        this.iterations = iterations;
+        this.helpRequested = false;
+        this.versionHelp = false;
+        this.inputFile = new File(inFile);
+        this.out = outDir;
+        this.ext = ext;
+        this.prefix = "";
+        this.mutEnum = MutEnum.RAND;
+    }
 
     @Override
     public String toString() {
