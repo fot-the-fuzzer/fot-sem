@@ -52,6 +52,9 @@ public class Mutator {
     public String insert(TokenStreamRewriter rewriter, NodeKeeper keeper) {
         logger.debug("insert...");
         int size = keeper.size();
+        if (size == 0) {
+            return "";
+        }
         int i1 = rnd.nextInt(size);
         MutNode n1 = keeper.get(i1);
         int i2 = rnd.nextInt(size);
@@ -66,6 +69,10 @@ public class Mutator {
 
     public String delete(TokenStreamRewriter rewriter, NodeKeeper keeper) {
         logger.debug("delete...");
+        int size = keeper.size();
+        if (size == 0) {
+            return "";
+        }
         int idx = rnd.nextInt(keeper.size());
         MutNode node = keeper.get(idx);
         this.delete(rewriter, node.getInterval());
@@ -75,6 +82,9 @@ public class Mutator {
     public String replace(TokenStreamRewriter rewriter, NodeKeeper keeper) {
         logger.debug("replace...");
         int size = keeper.size();
+        if (keeper.size() == 0) {
+            return "";
+        }
         int i1 = rnd.nextInt(size);
         int i2 = rnd.nextInt(size);
         // TODO should handle precisely later

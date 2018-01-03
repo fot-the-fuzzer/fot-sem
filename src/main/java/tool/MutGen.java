@@ -184,7 +184,7 @@ public class MutGen {
             try {
                 String mutatedText = mutateImpl(semMutate);
                 String md5 = Utils.getMD5(mutatedText);
-                if (!this.generatedMd5.contains(md5)) {
+                if (!mutatedText.isEmpty() && !this.generatedMd5.contains(md5)) {
                     dumpToFile(mutatedText, label);
                 }
             } catch (ParseErrorException e) {
