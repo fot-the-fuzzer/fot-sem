@@ -12,6 +12,9 @@ import java.io.File;
         header = "FOT Semantic Fuzzing CLI tool",
         description = "This is a wrapper for a jar runnable, which can also be used as a library/FFI.\n\n")
 public class CLIOptions {
+
+    public static String PREFIX = "gen";
+
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message and exit")
     private boolean helpRequested = false;
 
@@ -28,7 +31,7 @@ public class CLIOptions {
     public String ext;
 
     @Option(names = {"-p", "--prefix"}, description = "out files' name prefix (when output is a directory, used to avoid name clashes)")
-    public String prefix = "";
+    public String prefix = PREFIX;
 
     @Option(names = {"-s", "--start"}, description = "starting index")
     public long start = 0;
@@ -56,7 +59,7 @@ public class CLIOptions {
         this.inputFile = new File(inFile);
         this.out = outDir;
         this.ext = ext;
-        this.prefix = "";
+        this.prefix = PREFIX;
         this.mutEnum = MutEnum.RAND;
     }
 

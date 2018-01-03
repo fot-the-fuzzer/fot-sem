@@ -1,6 +1,7 @@
 package common;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,13 +34,21 @@ public class Utils {
         }
     }
 
-    public static String getBaseName(File file) {
+    public static String getLabelFromFileName(File file) {
         String name = file.getName();
         int pos = name.lastIndexOf('.');
         if (pos > 0) {
             name = name.substring(0, pos);
         }
         return name;
+    }
+
+    public static String getFileName(File file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            return file.getAbsolutePath();
+        }
     }
 
 }

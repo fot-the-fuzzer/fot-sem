@@ -20,6 +20,7 @@ public class SemMutate {
 
     private static Logger logger = LoggerFactory.getLogger(SemMutate.class);
 
+    private String fileName;
     private String label;
     private String content;
     private FotParser wrapper;
@@ -31,6 +32,10 @@ public class SemMutate {
 
     public String getLabel() {
         return label;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     static {
@@ -55,7 +60,7 @@ public class SemMutate {
         return getStreamFromFile(new File(fileName));
     }
 
-    public static String readFileToString(File inFile) {
+    private static String readFileToString(File inFile) {
         Path path = inFile.toPath();
         String content = null;
         try {
@@ -85,27 +90,11 @@ public class SemMutate {
         return CharStreams.fromString(buf);
     }
 
-
-    public SemMutate(String buf, String ext) throws ParserNotFoundException {
-        this(buf, ext, null);
-    }
-
-    public SemMutate(String buf, String ext, String label) throws ParserNotFoundException {
-        this.wrapper = initWrapper(ext);
-        this.mutator = new Mutator();
-        if (label != null) {
-            this.label = label;
-        } else {
-            this.label = "buf";
-        }
-        this.content = buf;
-        // leave keeper null
-    }
-
     public SemMutate(File file, String ext) throws ParserNotFoundException {
         this.wrapper = initWrapper(ext);
         this.mutator = new Mutator();
-        this.label = Utils.getBaseName(file);
+        this.fileName = Utils.getFileName(file);
+        this.label = Utils.getLabelFromFileName(file);
         this.content = readFileToString(file);
         // leave keeper null
     }
@@ -129,7 +118,7 @@ public class SemMutate {
                     return this.mutator.random(rewriter, this.keeper);
             }
         } catch (ParseErrorException e) {
-            e.setSource(this.label);
+            e.setSource(this.fileName);
             throw e;
         }
     }

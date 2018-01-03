@@ -70,11 +70,7 @@ public class MutGen {
             }
         }
         this.outputFile = outFile;
-        if (opt.prefix == null) {
-            this.prefix = "";
-        } else {
-            this.prefix = opt.prefix;
-        }
+        this.prefix = opt.prefix;
         this.generatedMd5 = new HashSet<>();
         this.counter = opt.start;
         this.semMutates = new ArrayList<>();
@@ -82,11 +78,11 @@ public class MutGen {
 
     private void initSeeds() {
         if (this.fromDir) {
-            File backupDir = new File(this.inputFile, "backup");
-            if (!backupDir.exists()) {
-                boolean success = backupDir.mkdirs();
+            File seedDir = new File(this.inputFile, "seeds");
+            if (!seedDir.exists()) {
+                boolean success = seedDir.mkdirs();
                 if (!success) {
-                    logger.error("cannot create directory: {}", backupDir);
+                    logger.error("cannot create directory: {}", seedDir);
                     System.exit(1);
                 }
             }
@@ -95,7 +91,7 @@ public class MutGen {
             if (inputFiles != null) {
                 for (File srcFile : inputFiles) {
                     if (srcFile.isFile()) {
-                        File dstFile = new File(backupDir, srcFile.getName());
+                        File dstFile = new File(seedDir, srcFile.getName());
                         boolean success = srcFile.renameTo(dstFile);
                         if (!success) {
                             logger.error("cannot rename {} to {}", srcFile, dstFile);
@@ -112,8 +108,8 @@ public class MutGen {
                     }
                 }
             }
-            // backup files into sem
-            File[] bakFiles = backupDir.listFiles();
+            // backup files into semantic generation
+            File[] bakFiles = seedDir.listFiles();
             if (bakFiles != null) {
                 for (File bakFile : bakFiles) {
                     if (bakFile.isFile()) {
@@ -165,11 +161,7 @@ public class MutGen {
 
     private void dumpToFile(String content, String label) {
         String fileName;
-        if (this.prefix.equals("")) {
-            fileName = String.format("%s-%08d.%s", label, this.counter, this.ext);
-        } else {
-            fileName = String.format("%s-%s-%08d.%s", this.prefix, label, this.counter, this.ext);
-        }
+        fileName = String.format("%s-%s-%08d.%s", this.prefix, label, this.counter, this.ext);
         Path outPath = Paths.get(this.outputFile.getPath(), fileName);
         OutputStream os = null;
         try {
@@ -187,7 +179,8 @@ public class MutGen {
         while (iterator.hasNext()) {
             SemMutate semMutate = iterator.next();
             String label = semMutate.getLabel();
-            logger.info("Iteration {} on {}", this.counter, label);
+            String fileName = semMutate.getFileName();
+            logger.info("Iteration {} on '{}'", this.counter, fileName);
             try {
                 String mutatedText = mutateImpl(semMutate);
                 String md5 = Utils.getMD5(mutatedText);
@@ -196,6 +189,11 @@ public class MutGen {
                 }
             } catch (ParseErrorException e) {
                 logger.warn("parsing error, source: {}, line: {}, column: {}, removing...\nmessage: {}\n", e.getSource(), e.getRow(), e.getColumn(), e.getMessage());
+                File file = new File(fileName);
+                boolean success = file.delete();
+                if (!success) {
+                    logger.warn("cannot remove {}", fileName);
+                }
                 iterator.remove();
             }
         }
