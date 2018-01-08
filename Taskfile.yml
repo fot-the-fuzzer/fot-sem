@@ -7,6 +7,7 @@ build:
 
 package:
   cmds:
+    - ./gradlew shadowJar
     - ./gradlew installDist
 
 install:
