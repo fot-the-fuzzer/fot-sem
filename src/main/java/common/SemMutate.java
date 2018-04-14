@@ -16,6 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * this corresponding to ONE file to be mutated
+ */
 public class SemMutate {
 
     private static Logger logger = LoggerFactory.getLogger(SemMutate.class);

@@ -13,7 +13,7 @@ import java.io.File;
         description = "This is a wrapper for a jar runnable, which can also be used as a library/FFI.\n\n")
 public class CLIOptions {
 
-    public static String PREFIX = "gen";
+    public static String PREFIX = "G";
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message and exit")
     private boolean helpRequested = false;
@@ -47,6 +47,9 @@ public class CLIOptions {
      */
     @Option(names = {"-n", "--num"}, description = "numbers of iterations to be generated, infinite when value <0")
     public long iterations = -1;
+
+    @Option(names = {"-r", "--remove"}, description = "whether removing the current seed if finding parsing errors")
+    public boolean removeIfFail = false;
 
     public CLIOptions() {
     }

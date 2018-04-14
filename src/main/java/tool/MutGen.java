@@ -23,6 +23,7 @@ public class MutGen {
     private File inputFile;
     private File outputFile;
     private long iterations;
+    private boolean removeIfFail;
     private HashSet<String> generatedMd5;
     private List<SemMutate> semMutates;
     private long counter;
@@ -39,6 +40,7 @@ public class MutGen {
 
     MutGen(CLIOptions opt) throws MutParseException {
         this.iterations = opt.iterations;
+        this.removeIfFail = opt.removeIfFail;
         this.inputFile = opt.inputFile;
         if (opt.inputFile.isDirectory()) {
             this.fromDir = true;
@@ -161,7 +163,7 @@ public class MutGen {
 
     private void dumpToFile(String content, String label) {
         String fileName;
-        fileName = String.format("%s-%s-%08d.%s", this.prefix, label, this.counter, this.ext);
+        fileName = String.format("%s%s-%08d.%s", this.prefix, label, this.counter, this.ext);
         Path outPath = Paths.get(this.outputFile.getPath(), fileName);
         OutputStream os = null;
         try {
@@ -174,8 +176,9 @@ public class MutGen {
         }
     }
 
-    private void mutate() {
+    private int mutate(boolean removeIfFail) {
         Iterator<SemMutate> iterator = this.semMutates.iterator();
+        int succeed_mutated = 0;
         while (iterator.hasNext()) {
             SemMutate semMutate = iterator.next();
             String label = semMutate.getLabel();
@@ -186,29 +189,35 @@ public class MutGen {
                 String md5 = Utils.getMD5(mutatedText);
                 if (!mutatedText.isEmpty() && !this.generatedMd5.contains(md5)) {
                     dumpToFile(mutatedText, label);
+                    succeed_mutated += 1;
                 }
             } catch (ParseErrorException e) {
-                logger.warn("parsing error, source: {}, line: {}, column: {}, removing...\nmessage: {}\n", e.getSource(), e.getRow(), e.getColumn(), e.getMessage());
-                File file = new File(fileName);
-                boolean success = file.delete();
-                if (!success) {
-                    logger.warn("cannot remove {}", fileName);
+                logger.warn("parsing error, src: {}, row: {}, col: {}, removing...\nmsg: {}\n", e.getSource(), e.getRow(), e.getColumn(), e.getMessage());
+                if (removeIfFail) {
+                    File file = new File(fileName);
+                    boolean success = file.delete();
+                    if (!success) {
+                        logger.warn("cannot remove {}", fileName);
+                    }
+                    iterator.remove();
                 }
-                iterator.remove();
             }
         }
+        return succeed_mutated;
     }
 
-    public void run() {
+    public int run() {
         initSeeds();
+        int new_seeds = 0;
         long last = this.counter + this.iterations;
         while (this.counter != last) {
             this.counter += 1;
             if (this.fromDir) {
                 collectNewSeeds();
             }
-            mutate();
+            new_seeds += mutate(this.removeIfFail);
         }
+        return new_seeds;
     }
 
 }
